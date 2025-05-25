@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub User Profile Viewer</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<style>
+    /* style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .search-box input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .search-box button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .search-box button:hover {
+    background-color: #0056b3;
+  }
+  
+  #profile-container {
+    text-align: center;
+  }
+  
+  #profile-container img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  #error-message {
+    color: red;
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
+</style>
+<body>
+  <div class="container">
+    <h1>GitHub Profile Viewer</h1>
+    <div class="search-box">
+      <input type="text" id="username" placeholder="Enter GitHub username" />
+      <button id="search-btn">Search</button>
+    </div>
+    <div id="profile-container" class="hidden">
+      <img id="avatar" alt="User Avatar" />
+      <h2 id="name"></h2>
+      <p id="bio"></p>
+      <p><strong>Followers:</strong> <span id="followers"></span></p>
+      <p><strong>Following:</strong> <span id="following"></span></p>
+      <p><strong>Repositories:</strong> <span id="repos"></span></p>
+      <a id="profile-link" href="#" target="_blank">View GitHub Profile</a>
+    </div>
+    <div id="error-message" class="hidden"></div>
+  </div>
+ <script>
+    // script.js
+
+const searchButton = document.getElementById("search-btn");
+const usernameInput = document.getElementById("username");
+const profileContainer = document.getElementById("profile-container");
+const errorMessage = document.getElementById("error-message");
+
+// Profile Fields
+const avatar = document.getElementById("avatar");
+const name = document.getElementById("name");
+const bio = document.getElementById("bio");
+const followers = document.getElementById("followers");
+const following = document.getElementById("following");
+const repos = document.getElementById("repos");
+const profileLink = document.getElementById("profile-link");
+
+// Fetch GitHub user data
+async function fetchGitHubProfile(username) {
+  const url = `https://api.github.com/users/${username}`;
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("User not found");
+    }
+
+    const data = await response.json();
+    displayProfile(data);
+  } catch (error) {
+    displayError(error.message);
+  }
+}
+
+// Display profile data
+function displayProfile(data) {
+  // Show the profile container and hide error message
+  profileContainer.classList.remove("hidden");
+  errorMessage.classList.add("hidden");
+
+  // Populate fields with data
+  avatar.src = data.avatar_url;
+  name.innerText = data.name || "No name provided";
+  bio.innerText = data.bio || "No bio available";
+  followers.innerText = data.followers;
+  following.innerText = data.following;
+  repos.innerText = data.public_repos;
+  profileLink.href = data.html_url;
+}
+
+// Display error message
+function displayError(message) {
+  // Show error message and hide profile container
+  errorMessage.innerText = message;
+  errorMessage.classList.remove("hidden");
+  profileContainer.classList.add("hidden");
+}
+
+// Handle search button click
+searchButton.addEventListener("click", () => {
+  const username = usernameInput.value.trim();
+  if (username) {
+    fetchGitHubProfile(username);
+  }
+});
+ </script>
+</body>
+</html>
